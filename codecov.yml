@@ -1,0 +1,14 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  status:
+    project:
+      core:
+        flags:
+          - core
+        target: auto
+
+comment:
+  layout: "header, diff, flags, components"
+  require_changes: false

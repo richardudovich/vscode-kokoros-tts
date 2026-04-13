@@ -2,7 +2,11 @@
 .github/**
 .serena/**
 src/**
+test/**
+coverage/**
 tsconfig.json
+vitest.config.ts
+codecov.yml
 scripts/**
 *.vsix
 resources/screenshot-demo.md

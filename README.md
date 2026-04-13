@@ -1,5 +1,8 @@
 # Kokoros Local TTS
 
+[![CI](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml/badge.svg)](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml)
+[![Core coverage](https://codecov.io/gh/richardudovich/vscode-kokoros-tts/graph/badge.svg?flag=core)](https://codecov.io/gh/richardudovich/vscode-kokoros-tts)
+
 Speak selected markdown or text from VS Code using a local [Kokoros](https://github.com/lucasjinreal/Kokoros) server.
 
 This extension is built for a fast local workflow:
@@ -169,6 +172,26 @@ Compile:
 ```bash
 npm run compile
 ```
+
+Test the core logic:
+
+```bash
+npm run test
+```
+
+Generate a coverage report:
+
+```bash
+npm run test:coverage
+```
+
+Run the local verification bundle:
+
+```bash
+npm run verify
+```
+
+GitHub Actions runs compile + coverage on pushes to `main` and on pull requests.
 
 Run the extension in VS Code:
 

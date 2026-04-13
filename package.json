@@ -309,6 +309,10 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "verify": "npm run compile && npm run test:coverage",
     "watch": "tsc -watch -p ./",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package",
@@ -317,7 +321,9 @@
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/vscode": "^1.115.0",
+    "@vitest/coverage-v8": "^4.1.4",
     "@vscode/vsce": "^3.6.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.4"
   }
 }
