@@ -1,0 +1,289 @@
+{
+  "name": "vscode-kokoros-tts",
+  "displayName": "Kokoros TTS Preview",
+  "description": "Speak selected markdown or text from VS Code using a local Kokoros server.",
+  "version": "0.0.2",
+  "publisher": "richard-udovich",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/richardudovich/vscode-kokoros-tts.git"
+  },
+  "engines": {
+    "vscode": "^1.115.0"
+  },
+  "categories": [
+    "Other",
+    "Productivity"
+  ],
+  "keywords": [
+    "tts",
+    "kokoro",
+    "kokoros",
+    "markdown",
+    "audio",
+    "speech"
+  ],
+  "activationEvents": [
+    "onCommand:kokorosTts.speakSelection",
+    "onCommand:kokorosTts.speakDocument",
+    "onCommand:kokorosTts.startServer",
+    "onCommand:kokorosTts.stopServer",
+    "onCommand:kokorosTts.restartServer",
+    "onCommand:kokorosTts.checkSetup",
+    "onCommand:kokorosTts.cancelGeneration",
+    "onCommand:kokorosTts.stopPlayback",
+    "onCommand:kokorosTts.manageAudio",
+    "onCommand:kokorosTts.manageAudioFiles",
+    "onCommand:kokorosTts.manageServers",
+    "onCommand:kokorosTts.clearQueue",
+    "onCommand:kokorosTts.removeQueuedItem"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "kokorosTts.speakSelection",
+        "title": "Speak with Kokoros",
+        "category": "Kokoros TTS",
+        "icon": "$(unmute)"
+      },
+      {
+        "command": "kokorosTts.speakDocument",
+        "title": "Speak Active Document with Kokoros",
+        "category": "Kokoros TTS",
+        "icon": "$(book)"
+      },
+      {
+        "command": "kokorosTts.startServer",
+        "title": "Start Kokoros Server",
+        "category": "Kokoros TTS",
+        "icon": "$(play)"
+      },
+      {
+        "command": "kokorosTts.stopServer",
+        "title": "Stop Kokoros Server",
+        "category": "Kokoros TTS",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "kokorosTts.restartServer",
+        "title": "Restart Kokoros Server",
+        "category": "Kokoros TTS",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "kokorosTts.checkSetup",
+        "title": "Check Kokoros Setup",
+        "category": "Kokoros TTS",
+        "icon": "$(pulse)"
+      },
+      {
+        "command": "kokorosTts.cancelGeneration",
+        "title": "Cancel Current Generation",
+        "category": "Kokoros TTS",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "kokorosTts.stopPlayback",
+        "title": "Stop Playback",
+        "category": "Kokoros TTS",
+        "icon": "$(stop-circle)"
+      },
+      {
+        "command": "kokorosTts.manageAudio",
+        "title": "Manage Kokoros Audio",
+        "category": "Kokoros TTS",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "kokorosTts.manageAudioFiles",
+        "title": "Manage Generated Audio Files",
+        "category": "Kokoros TTS",
+        "icon": "$(files)"
+      },
+      {
+        "command": "kokorosTts.manageServers",
+        "title": "Manage Kokoros Servers",
+        "category": "Kokoros TTS",
+        "icon": "$(server-process)"
+      },
+      {
+        "command": "kokorosTts.clearQueue",
+        "title": "Clear Kokoros Queue",
+        "category": "Kokoros TTS",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "kokorosTts.removeQueuedItem",
+        "title": "Remove Queued Kokoros Item",
+        "category": "Kokoros TTS",
+        "icon": "$(trash)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "kokorosTts.queueView",
+          "name": "Kokoros Queue"
+        }
+      ]
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "kokorosTts.speakSelection",
+          "when": "editorTextFocus && editorHasSelection",
+          "group": "navigation@50"
+        },
+        {
+          "command": "kokorosTts.speakDocument",
+          "when": "editorTextFocus",
+          "group": "navigation@51"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "kokorosTts.speakSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "kokorosTts.manageAudio"
+        },
+        {
+          "command": "kokorosTts.manageAudioFiles"
+        },
+        {
+          "command": "kokorosTts.manageServers"
+        },
+        {
+          "command": "kokorosTts.clearQueue"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "kokorosTts.cancelGeneration",
+          "when": "view == kokorosTts.queueView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "kokorosTts.clearQueue",
+          "when": "view == kokorosTts.queueView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "kokorosTts.manageAudio",
+          "when": "view == kokorosTts.queueView",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "kokorosTts.removeQueuedItem",
+          "when": "view == kokorosTts.queueView && viewItem == queuedItem",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Kokoros TTS Preview",
+      "properties": {
+        "kokorosTts.kokorosExecutable": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Absolute path to the `koko` executable. Leave empty to auto-detect common locations."
+        },
+        "kokorosTts.kokorosWorkingDirectory": {
+          "type": "string",
+          "default": "/tmp/Kokoros",
+          "scope": "machine",
+          "markdownDescription": "Working directory where Kokoros model and voice files live."
+        },
+        "kokorosTts.modelPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Optional absolute path to the Kokoro ONNX model. Leave empty to use Kokoros defaults."
+        },
+        "kokorosTts.voiceDataPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Optional absolute path to the Kokoro voices data file. Leave empty to use Kokoros defaults."
+        },
+        "kokorosTts.port": {
+          "type": "number",
+          "default": 3001,
+          "minimum": 1024,
+          "maximum": 65535,
+          "scope": "machine",
+          "markdownDescription": "Local port for the Kokoros OpenAI-compatible server."
+        },
+        "kokorosTts.instances": {
+          "type": "number",
+          "default": 4,
+          "minimum": 1,
+          "maximum": 8,
+          "scope": "machine",
+          "markdownDescription": "Number of Kokoros worker instances to keep warm. Higher numbers can improve long-text throughput on faster CPUs."
+        },
+        "kokorosTts.voice": {
+          "type": "string",
+          "default": "af_sky",
+          "scope": "resource",
+          "markdownDescription": "Voice name passed to Kokoros."
+        },
+        "kokorosTts.speed": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.5,
+          "maximum": 2,
+          "scope": "resource",
+          "markdownDescription": "Speech rate multiplier passed to Kokoros."
+        },
+        "kokorosTts.autoStartServer": {
+          "type": "boolean",
+          "default": true,
+          "scope": "machine",
+          "markdownDescription": "Automatically start the local Kokoros server when you use a speech command."
+        },
+        "kokorosTts.streamAudio": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "markdownDescription": "Use Kokoros streaming PCM mode, which gives the best latency and better long-text throughput."
+        },
+        "kokorosTts.stripMarkdown": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "markdownDescription": "Lightly normalize markdown before speech so headings and emphasis markers read more naturally."
+        },
+        "kokorosTts.highlightMode": {
+          "type": "string",
+          "default": "estimated",
+          "enum": [
+            "off",
+            "estimated"
+          ],
+          "scope": "resource",
+          "markdownDescription": "Optional playback highlighting mode. `estimated` uses sentence timing estimates based on the final audio duration."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package",
+    "prepackage": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.115.0",
+    "@vscode/vsce": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}
