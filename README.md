@@ -15,10 +15,41 @@ The extension talks to Kokoros through its local OpenAI-compatible HTTP server.
 
 - Right-click command for editor selections
 - Command to speak the full active document
+- Auto-detects existing Kokoros installs and checkouts in common local locations
 - Auto-start, stop, and restart commands for the local Kokoros server
 - Configurable worker instance count, voice, port, speech speed, and markdown cleanup
 - Streaming mode for better latency and better long-text throughput
 - Estimated playback highlighting for markdown or prose selections
+
+## Screenshots
+
+### Speak from an editor selection
+
+![Speak from an editor selection](resources/screenshots/1.png)
+
+### Queue view
+
+![Queue view](resources/screenshots/2.png)
+
+### Generation feedback
+
+![Generation feedback with cancel action](resources/screenshots/3.png)
+
+### Manage Kokoros audio
+
+![Manage Kokoros audio](resources/screenshots/4.png)
+
+### Manage Kokoros servers
+
+![Manage Kokoros servers](resources/screenshots/5.png)
+
+### Generated audio files
+
+![Generated audio files](resources/screenshots/6.png)
+
+### Playback panel
+
+![Playback panel](resources/screenshots/7.png)
 
 ## Requirements
 
@@ -34,12 +65,30 @@ brew install pkg-config opus cmake
 
 ## Quick setup
 
-### Option 1: use the included bootstrap helper on macOS
+### Recommended: let the extension install Kokoros for you
 
-```bash
-cd /path/to/vscode-kokoros-tts
-bash scripts/bootstrap-kokoros-macos.sh
-```
+Open the Command Palette and run:
+
+- `Kokoros TTS: Install or Repair Kokoros`
+
+Before doing a full install, the extension will first try to reuse an existing Kokoros build automatically. It checks:
+
+- the current configured path, if you already set one
+- `~/.local/share/Kokoros`
+- `~/.local/share/kokoros`
+- `/tmp/Kokoros`
+- `koko` on your `PATH`
+
+If it finds one, it wires `kokorosTts.kokorosExecutable` and `kokorosTts.kokorosWorkingDirectory` for you.
+
+That opens an integrated terminal and runs the bundled installer. On macOS it will:
+
+- install Xcode Command Line Tools if needed
+- install Homebrew if needed
+- install `git`, `pkg-config`, `opus`, and `cmake`
+- install the Rust toolchain if needed
+- clone or update Kokoros
+- build the `koko` binary
 
 By default that installs Kokoros into `~/.local/share/Kokoros` and builds:
 
@@ -47,18 +96,12 @@ By default that installs Kokoros into `~/.local/share/Kokoros` and builds:
 ~/.local/share/Kokoros/target/release/koko
 ```
 
-### Option 2: point the extension at an existing Kokoros checkout
+### Advanced override
 
-If you already built Kokoros somewhere else, set:
+If you want to force a specific checkout, you can still set:
 
 - `kokorosTts.kokorosExecutable`
 - `kokorosTts.kokorosWorkingDirectory`
-
-The current machine used during development also works with:
-
-```text
-/tmp/Kokoros/target/release/koko
-```
 
 ## Extension settings
 
@@ -106,6 +149,7 @@ from the Command Palette.
 
 Use the Command Palette:
 
+- `Kokoros TTS: Install or Repair Kokoros`
 - `Kokoros TTS: Start Server`
 - `Kokoros TTS: Stop Server`
 - `Kokoros TTS: Restart Server`
@@ -113,7 +157,7 @@ Use the Command Palette:
 
 ## Development
 
-Install dependencies:
+Install extension dependencies:
 
 ```bash
 cd /path/to/vscode-kokoros-tts
