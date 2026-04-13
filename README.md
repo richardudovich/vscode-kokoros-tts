@@ -1,9 +1,9 @@
 # Kokoros Local TTS
 
-[![CI](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml/badge.svg)](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml)
-[![Core coverage](https://codecov.io/gh/richardudovich/vscode-kokoros-tts/graph/badge.svg?flag=core)](https://codecov.io/gh/richardudovich/vscode-kokoros-tts)
-[![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/RichardUdovich.vscode-kokoros-tts?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=RichardUdovich.vscode-kokoros-tts)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/RichardUdovich.vscode-kokoros-tts?label=Installs)](https://marketplace.visualstudio.com/items?itemName=RichardUdovich.vscode-kokoros-tts)
+[![CI](https://img.shields.io/github/actions/workflow/status/richardudovich/vscode-kokoros-tts/ci.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml)
+[![Core coverage](https://img.shields.io/codecov/c/github/richardudovich/vscode-kokoros-tts/main?flag=core&label=core%20coverage&logo=codecov&style=flat-square)](https://codecov.io/gh/richardudovich/vscode-kokoros-tts)
+[![VS Marketplace version](https://vsmarketplacebadges.dev/version-short/RichardUdovich.vscode-kokoros-tts.svg)](https://marketplace.visualstudio.com/items?itemName=RichardUdovich.vscode-kokoros-tts)
+[![VS Marketplace installs](https://vsmarketplacebadges.dev/installs-short/RichardUdovich.vscode-kokoros-tts.svg)](https://marketplace.visualstudio.com/items?itemName=RichardUdovich.vscode-kokoros-tts)
 
 Speak selected markdown or text from VS Code using a local [Kokoros](https://github.com/lucasjinreal/Kokoros) server.
 
