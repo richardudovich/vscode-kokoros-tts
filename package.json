@@ -3,7 +3,7 @@
   "displayName": "Kokoros Local TTS",
   "description": "Local text-to-speech for VS Code with Kokoros, queue controls, and built-in server management.",
   "version": "0.0.6",
-  "publisher": "richard-udovich",
+  "publisher": "RichardUdovich",
   "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://github.com/richardudovich/vscode-kokoros-tts#readme",
   "bugs": {

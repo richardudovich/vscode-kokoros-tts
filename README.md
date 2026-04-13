@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml/badge.svg)](https://github.com/richardudovich/vscode-kokoros-tts/actions/workflows/ci.yml)
 [![Core coverage](https://codecov.io/gh/richardudovich/vscode-kokoros-tts/graph/badge.svg?flag=core)](https://codecov.io/gh/richardudovich/vscode-kokoros-tts)
+[![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/RichardUdovich.vscode-kokoros-tts?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=RichardUdovich.vscode-kokoros-tts)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/RichardUdovich.vscode-kokoros-tts?label=Installs)](https://marketplace.visualstudio.com/items?itemName=RichardUdovich.vscode-kokoros-tts)
 
 Speak selected markdown or text from VS Code using a local [Kokoros](https://github.com/lucasjinreal/Kokoros) server.
 
@@ -192,6 +194,17 @@ npm run verify
 ```
 
 GitHub Actions runs compile + coverage on pushes to `main` and on pull requests.
+
+## Release automation
+
+Pushes to `main` can auto-publish the extension to both the Visual Studio Marketplace and Open VSX.
+
+Required GitHub repository secrets:
+
+- `VSCE_PAT` for the Visual Studio Marketplace publisher
+- `OVSX_PAT` for Open VSX publishing
+
+The publish workflow verifies the extension, bumps the patch version, publishes the same VSIX to both registries, and then pushes the release commit and tag back to `main`.
 
 Run the extension in VS Code:
 
