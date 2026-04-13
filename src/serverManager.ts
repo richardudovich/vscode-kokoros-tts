@@ -15,6 +15,11 @@ interface ResolvedSetup {
   args: string[];
 }
 
+export interface DetectedKokorosSetup {
+  executablePath: string;
+  workingDirectory: string;
+}
+
 export class KokorosServerManager implements vscode.Disposable {
   private readonly outputChannel = vscode.window.createOutputChannel("Kokoros TTS");
   private process?: ChildProcessWithoutNullStreams;
@@ -230,9 +235,23 @@ export class KokorosServerManager implements vscode.Disposable {
 }
 
 async function resolveExecutablePath(settings: KokorosSettings): Promise<string> {
+  const detected = await detectLocalKokorosSetup(settings);
+  if (detected) {
+    return detected.executablePath;
+  }
+
+  throw new Error(
+    "Could not find the `koko` executable. The extension can auto-detect common Kokoros locations or run the built-in installer."
+  );
+}
+
+export async function detectLocalKokorosSetup(settings: KokorosSettings): Promise<DetectedKokorosSetup | undefined> {
   const configured = settings.kokorosExecutable;
   if (configured && await pathExists(configured)) {
-    return configured;
+    return {
+      executablePath: configured,
+      workingDirectory: await resolveWorkingDirectory(settings, configured)
+    };
   }
 
   const workingDirectory = settings.kokorosWorkingDirectory;
@@ -240,13 +259,15 @@ async function resolveExecutablePath(settings: KokorosSettings): Promise<string>
     workingDirectory ? path.join(workingDirectory, "target", "release", "koko") : "",
     "/tmp/Kokoros/target/release/koko",
     path.join(os.homedir(), ".local", "share", "Kokoros", "target", "release", "koko"),
-    path.join(os.homedir(), ".local", "share", "kokoros", "target", "release", "koko"),
-    path.join(os.homedir(), "Desktop", "share", "pulse", "Kokoros", "target", "release", "koko")
+    path.join(os.homedir(), ".local", "share", "kokoros", "target", "release", "koko")
   ].filter(Boolean);
 
   for (const candidate of candidates) {
     if (await pathExists(candidate)) {
-      return candidate;
+      return {
+        executablePath: candidate,
+        workingDirectory: await resolveWorkingDirectory(settings, candidate)
+      };
     }
   }
 
@@ -254,15 +275,16 @@ async function resolveExecutablePath(settings: KokorosSettings): Promise<string>
     const { stdout } = await execFile("which", ["koko"]);
     const pathFromShell = stdout.trim();
     if (pathFromShell) {
-      return pathFromShell;
+      return {
+        executablePath: pathFromShell,
+        workingDirectory: await resolveWorkingDirectory(settings, pathFromShell)
+      };
     }
   } catch {
     // Ignore and fall through to user-facing error.
   }
 
-  throw new Error(
-    "Could not find the `koko` executable. Set kokorosTts.kokorosExecutable or install/build Kokoros first."
-  );
+  return undefined;
 }
 
 async function resolveWorkingDirectory(settings: KokorosSettings, executablePath: string): Promise<string> {

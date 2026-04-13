@@ -1,10 +1,14 @@
 {
   "name": "vscode-kokoros-tts",
-  "displayName": "Kokoros TTS Preview",
-  "description": "Speak selected markdown or text from VS Code using a local Kokoros server.",
-  "version": "0.0.2",
+  "displayName": "Kokoros Local TTS",
+  "description": "Local text-to-speech for VS Code with Kokoros, queue controls, and built-in server management.",
+  "version": "0.0.6",
   "publisher": "richard-udovich",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://github.com/richardudovich/vscode-kokoros-tts#readme",
+  "bugs": {
+    "url": "https://github.com/richardudovich/vscode-kokoros-tts/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/richardudovich/vscode-kokoros-tts.git"
@@ -13,17 +17,32 @@
     "vscode": "^1.115.0"
   },
   "categories": [
-    "Other",
-    "Productivity"
+    "Machine Learning",
+    "Other"
   ],
   "keywords": [
     "tts",
+    "text-to-speech",
+    "read-aloud",
+    "read aloud",
+    "speech-synthesis",
+    "local-ai",
     "kokoro",
     "kokoros",
     "markdown",
     "audio",
-    "speech"
+    "speech",
+    "voice",
+    "audiobook"
   ],
+  "preview": true,
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#0f766e",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "markdown": "github",
   "activationEvents": [
     "onCommand:kokorosTts.speakSelection",
     "onCommand:kokorosTts.speakDocument",
@@ -37,7 +56,8 @@
     "onCommand:kokorosTts.manageAudioFiles",
     "onCommand:kokorosTts.manageServers",
     "onCommand:kokorosTts.clearQueue",
-    "onCommand:kokorosTts.removeQueuedItem"
+    "onCommand:kokorosTts.removeQueuedItem",
+    "onCommand:kokorosTts.installDependencies"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -119,6 +139,12 @@
         "title": "Remove Queued Kokoros Item",
         "category": "Kokoros TTS",
         "icon": "$(trash)"
+      },
+      {
+        "command": "kokorosTts.installDependencies",
+        "title": "Install or Repair Kokoros",
+        "category": "Kokoros TTS",
+        "icon": "$(cloud-download)"
       }
     ],
     "views": {
@@ -158,6 +184,9 @@
         },
         {
           "command": "kokorosTts.clearQueue"
+        },
+        {
+          "command": "kokorosTts.installDependencies"
         }
       ],
       "view/title": [
@@ -175,6 +204,11 @@
           "command": "kokorosTts.manageAudio",
           "when": "view == kokorosTts.queueView",
           "group": "navigation@3"
+        },
+        {
+          "command": "kokorosTts.installDependencies",
+          "when": "view == kokorosTts.queueView",
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [
@@ -186,7 +220,7 @@
       ]
     },
     "configuration": {
-      "title": "Kokoros TTS Preview",
+      "title": "Kokoros TTS",
       "properties": {
         "kokorosTts.kokorosExecutable": {
           "type": "string",
@@ -196,9 +230,9 @@
         },
         "kokorosTts.kokorosWorkingDirectory": {
           "type": "string",
-          "default": "/tmp/Kokoros",
+          "default": "~/.local/share/Kokoros",
           "scope": "machine",
-          "markdownDescription": "Working directory where Kokoros model and voice files live."
+          "markdownDescription": "Working directory where the extension installs and runs Kokoros. `~` is supported."
         },
         "kokorosTts.modelPath": {
           "type": "string",

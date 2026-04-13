@@ -68,6 +68,7 @@ export class PlaybackPanel {
     const audioUri = webview.asWebviewUri(vscode.Uri.file(this.options.audioPath));
     const sourceName = escapeHtml(this.options.sourceLabel);
     const title = escapeHtml(this.options.title);
+    const audioFileName = escapeHtml(path.basename(this.options.audioPath));
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -127,7 +128,7 @@ export class PlaybackPanel {
       <h1>${title}</h1>
       <p>${sourceName}</p>
       <audio id="player" controls autoplay src="${audioUri}"></audio>
-      <div class="path">${escapeHtml(this.options.audioPath)}</div>
+      <div class="path">Generated file: ${audioFileName}</div>
     </div>
     <script>
       const vscode = acquireVsCodeApi();

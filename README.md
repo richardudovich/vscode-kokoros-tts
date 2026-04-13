@@ -1,4 +1,4 @@
-# Kokoros TTS Preview
+# Kokoros Local TTS
 
 Speak selected markdown or text from VS Code using a local [Kokoros](https://github.com/lucasjinreal/Kokoros) server.
 

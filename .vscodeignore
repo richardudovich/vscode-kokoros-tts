@@ -1,5 +1,12 @@
 .git/**
 .github/**
+.serena/**
 src/**
 tsconfig.json
 scripts/**
+*.vsix
+resources/screenshot-demo.md
+resources/screenshots/kokoros-screenshot-server.log
+resources/screenshots/manage-audio.png
+resources/screenshots/playback-panel.png
+resources/screenshots/queue-status.png

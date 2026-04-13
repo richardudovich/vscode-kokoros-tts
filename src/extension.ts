@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import { synthesizeSpeech } from "./audioClient";
 import { getSettings, isServerConfigurationChange } from "./config";
 import { PlaybackHighlighter } from "./highlighting";
+import { adoptDetectedKokorosSetup, installKokorosDependencies, promptToInstallKokoros } from "./installer";
 import { deleteAllGeneratedAudioFiles, deleteGeneratedAudioFile, ensureAudioLibrary, formatFileSize, listGeneratedAudioFiles } from "./library";
 import { PlaybackPanel } from "./playbackPanel";
 import { QueueTreeItem, SpeechQueueManager } from "./queue";
@@ -67,6 +68,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(registerSafeCommand("kokorosTts.startServer", serverManager, async () => {
     const settings = getSettings();
+    let ready = false;
     setPhase(runtimeState, statusBar, "starting");
     await vscode.window.withProgress(
       {
@@ -76,14 +78,16 @@ export function activate(context: vscode.ExtensionContext): void {
       },
       async (progress) => {
         progress.report({ message: "Making sure a Kokoros server is available..." });
-        await serverManager.ensureRunning(settings, (message) => {
+        ready = await ensureServerReady(context, serverManager, settings, (message) => {
           progress.report({ message });
           serverManager.log(message);
         });
       }
     );
     setPhase(runtimeState, statusBar, "idle");
-    vscode.window.showInformationMessage(`Kokoros server is ready on port ${settings.port}.`);
+    if (ready) {
+      vscode.window.showInformationMessage(`Kokoros server is ready on port ${settings.port}.`);
+    }
   }));
 
   context.subscriptions.push(registerSafeCommand("kokorosTts.stopServer", serverManager, async () => {
@@ -131,6 +135,17 @@ export function activate(context: vscode.ExtensionContext): void {
 
     await vscode.window.showTextDocument(document, { preview: false });
     serverManager.revealLogs();
+  }));
+
+  context.subscriptions.push(registerSafeCommand("kokorosTts.installDependencies", serverManager, async () => {
+    const installed = await installKokorosDependencies(context, getSettings());
+    if (installed) {
+      const refreshedSettings = getSettings();
+      await serverManager.ensureRunning(refreshedSettings, (message) => {
+        serverManager.log(message);
+      });
+      vscode.window.showInformationMessage(`Kokoros was installed and started on port ${refreshedSettings.port}.`);
+    }
   }));
 
   context.subscriptions.push(registerSafeCommand("kokorosTts.cancelGeneration", serverManager, async () => {
@@ -213,6 +228,7 @@ async function speakFromEditor(
   const queueTicket = queueManager.enqueue(request.target.sourceLabel, `${request.spokenText.length} chars`);
   let readyAudio: ReadyAudio | undefined;
   let turnAcquired = false;
+  let setupHandled = false;
 
   if (queueTicket.aheadCount > 0) {
     vscode.window.showInformationMessage(
@@ -245,10 +261,14 @@ async function speakFromEditor(
 
         setPhase(runtimeState, statusBar, "starting");
         progress.report({ message: "Checking local Kokoros server..." });
-        await serverManager.ensureRunning(request.settings, (message) => {
+        const ready = await ensureServerReady(context, serverManager, request.settings, (message) => {
           progress.report({ message });
           serverManager.log(message);
         });
+        if (!ready) {
+          setupHandled = true;
+          return;
+        }
 
         if (abortController.signal.aborted) {
           throw new Error("Kokoros generation cancelled.");
@@ -278,6 +298,10 @@ async function speakFromEditor(
         };
       }
     );
+
+    if (setupHandled) {
+      return;
+    }
 
     if (!readyAudio) {
       throw new Error("Speech generation completed without producing an audio result.");
@@ -354,6 +378,11 @@ async function manageAudio(
   statusBar: vscode.StatusBarItem
 ): Promise<void> {
   const actions: Array<{ label: string; detail: string; run: () => Promise<void> }> = [
+    {
+      label: "$(cloud-download) Install or repair Kokoros",
+      detail: "Run the built-in macOS installer for Homebrew, Rust, and Kokoros",
+      run: async () => vscode.commands.executeCommand("kokorosTts.installDependencies")
+    },
     {
       label: "$(play) Speak selection",
       detail: "Generate speech for the current editor selection",
@@ -710,6 +739,45 @@ function resolveEditor(commandArgs: unknown[]): vscode.TextEditor | undefined {
   }
 
   return vscode.window.visibleTextEditors.find((editor) => editor.document.uri.scheme === "file");
+}
+
+async function ensureServerReady(
+  context: vscode.ExtensionContext,
+  serverManager: KokorosServerManager,
+  settings: ReturnType<typeof getSettings>,
+  onStatus?: (message: string) => void
+): Promise<boolean> {
+  try {
+    await serverManager.ensureRunning(settings, onStatus);
+    return true;
+  } catch (error) {
+    const adopted = await adoptDetectedKokorosSetup(settings);
+    if (adopted) {
+      serverManager.log(`Auto-detected existing Kokoros at ${adopted.workingDirectory}`);
+      const refreshedSettings = getSettings();
+      await serverManager.ensureRunning(refreshedSettings, onStatus);
+      void vscode.window.showInformationMessage(`Detected and connected existing Kokoros at ${adopted.workingDirectory}.`);
+      return true;
+    }
+
+    const action = await promptToInstallKokoros(error);
+    if (action === "guide") {
+      await vscode.commands.executeCommand("kokorosTts.checkSetup");
+      return false;
+    }
+
+    if (action === "install") {
+      const installed = await installKokorosDependencies(context, settings);
+      if (!installed) {
+        return false;
+      }
+
+      const refreshedSettings = getSettings();
+      await serverManager.ensureRunning(refreshedSettings, onStatus);
+      return true;
+    }
+    throw error;
+  }
 }
 
 function buildSpeakRequest(commandArgs: unknown[], mode: SpeakMode): SpeakRequest {
